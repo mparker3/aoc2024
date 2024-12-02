@@ -24,27 +24,30 @@ fn gt(x: i32, y: i32) -> bool {x > y}
 fn lt(x: i32, y: i32) -> bool {x < y}
 
 fn check_is_safe(report: &Vec<i32>) -> bool {
-    if report[0] == report[1] {
-        // bail early. 
-        return false
-    }
-    let is_increasing = report[0] < report[1];
-    let cmp: fn(i32, i32) -> bool;
-    if is_increasing {
-        cmp = lt; 
-    } else {
-        cmp = gt;
-    }
-
-
-    let  idx = is_safe(report, is_increasing, cmp);
-    if idx == -1 {
+    if is_safe_increasing(report) == -1 || is_safe_decreasing(report) == -1 {
         return true
-    } else {
-        let mut report = report.clone();
-        report.remove(idx as usize);
-        return is_safe(&report, is_increasing, cmp) == -1
     }
+    // generate all possible permutations of removing an element from the report
+    let mut possible_reports = Vec::new();
+    for (idx, _) in report.iter().enumerate() {
+        let mut report_copy = report.clone();
+        report_copy.remove(idx);
+        possible_reports.push(report_copy);
+    }
+    
+    for report in possible_reports {
+        if is_safe_increasing(&report) == -1 || is_safe_decreasing(&report) == -1 {
+            return true
+        }
+    }
+    return false
+}
+fn is_safe_increasing(report: &Vec<i32>) -> i32 {
+    return is_safe(report, true, lt)
+}
+
+fn is_safe_decreasing(report: &Vec<i32>) -> i32 {
+    return is_safe(report, false, gt)
 }
 
 fn is_safe(report: &Vec<i32>, is_increasing: bool, cmp: fn(i32, i32) -> bool) -> i32 {
@@ -80,6 +83,16 @@ mod tests {
         assert!(check_is_safe(&vec![1, 3, 6, 7, 9]));
         assert!(check_is_safe(&vec![1, 3, 2, 4, 5]));
         assert!(check_is_safe(&vec![8, 6, 4, 4, 1]));
+
+        assert!(check_is_safe(&vec![48, 46, 47, 49, 51, 54, 56]));
+        assert!(check_is_safe(&vec![1,1,2,3,4,5]));
+        assert!(check_is_safe(&vec![1,2,3,4,5,5]));
+        assert!(check_is_safe(&vec![1,4,3,2,1]));
+        assert!(check_is_safe(&vec![1,6,7,8,9]));
+        assert!(check_is_safe(&vec![1,2,3,4,3]));
+        assert!(check_is_safe(&vec![9,8,7,6,7]));
+        assert!(check_is_safe(&vec![7,10,8,10,11]));
+        assert!(check_is_safe(&vec![29,28,27,25,26,25,22,20]));
         
         assert!(check_is_safe(&vec![5, 4, 3, 2, 1]));
         assert!(check_is_safe(&vec![1, 2, 2, 3, 4]));
