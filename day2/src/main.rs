@@ -36,13 +36,29 @@ fn check_is_safe(report: &Vec<i32>) -> bool {
         cmp = gt;
     }
 
-    report.iter().skip(1).fold((report[0], true), |(last_val, is_mono), &curr_val|{
-        (curr_val, is_mono && cmp(last_val, curr_val) 
-        && check_bounds(last_val, curr_val, is_increasing)
-    )
-    }).1
 
+    let  idx = is_safe(report, is_increasing, cmp);
+    if idx == -1 {
+        return true
+    } else {
+        let mut report = report.clone();
+        report.remove(idx as usize);
+        return is_safe(&report, is_increasing, cmp) == -1
+    }
 }
+
+fn is_safe(report: &Vec<i32>, is_increasing: bool, cmp: fn(i32, i32) -> bool) -> i32 {
+    let mut last_val = report[0];
+    for (idx, &curr_val) in report.iter().enumerate().skip(1) {
+        if !check_bounds(last_val, curr_val, is_increasing) || !cmp(last_val, curr_val) {
+            return idx as i32
+        }
+        last_val = curr_val;
+    }
+    return -1
+}
+
+
 
 fn check_bounds(last_val: i32, curr_val: i32, is_increasing: bool) -> bool {
     if is_increasing {
@@ -62,14 +78,16 @@ mod tests {
         assert!(check_is_safe(&vec![1, 2, 3, 4, 5]));
         assert!(check_is_safe(&vec![7, 6, 4, 2, 1]));
         assert!(check_is_safe(&vec![1, 3, 6, 7, 9]));
+        assert!(check_is_safe(&vec![1, 3, 2, 4, 5]));
+        assert!(check_is_safe(&vec![8, 6, 4, 4, 1]));
         
         assert!(check_is_safe(&vec![5, 4, 3, 2, 1]));
-        
-        assert!(!check_is_safe(&vec![1, 2, 2, 3, 4]));
+        assert!(check_is_safe(&vec![1, 2, 2, 3, 4]));
+        assert!(check_is_safe(&vec![1, 2, 1, 3, 4])); 
+
         assert!(!check_is_safe(&vec![1, 2, 7, 8, 9]));
         assert!(!check_is_safe(&vec![9, 7, 6, 2, 1]));
 
-        assert!(!check_is_safe(&vec![1, 2, 1, 3, 4])); 
     }
 
 }
