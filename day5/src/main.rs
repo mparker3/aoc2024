@@ -1,5 +1,5 @@
 use core::panic;
-use std::{fs::File, io::{Read, Result}};
+use std::{collections::HashMap, fs::File, io::{Read, Result}};
 
 #[derive(Debug)]
 struct Rule {
@@ -10,7 +10,7 @@ struct Rule {
 fn main() -> Result<()> {
     use std::time::Instant;
     let now = Instant::now();
-    let path = "./sample.txt";
+    let path = "./input.txt";
     let mut file = File::open(path)?;
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
@@ -90,15 +90,15 @@ fn corrected(incorrect: Vec<i32>, rule_lookup_table: &HashMap<i32,Vec<i32>>) -> 
         let to_correct = corrected.remove(incorrect_pos);
         let rules = rule_lookup_table.get(&to_correct).unwrap();
         for rule in rules {
-            if !before.contains(&rule) {
-                corrected.insert(incorrect_pos, *rule);
+            if before.contains(&rule) {
+                let new_pos = corrected.iter().position(|x|x == rule).unwrap();
+                corrected.insert(new_pos, to_correct);
                 break;
             }
         }
         
         i += 1;
-        println!("===============================");
-        if i > 1000 {
+        if i > 10000 {
             panic!("infinite loop");
         }
     }
