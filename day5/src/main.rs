@@ -1,4 +1,5 @@
-use std::{collections::HashMap, fs::File, io::{Read, Result}, string};
+use core::panic;
+use std::{fs::File, io::{Read, Result}};
 
 #[derive(Debug)]
 struct Rule {
@@ -9,7 +10,7 @@ struct Rule {
 fn main() -> Result<()> {
     use std::time::Instant;
     let now = Instant::now();
-    let path = "./input.txt";
+    let path = "./sample.txt";
     let mut file = File::open(path)?;
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
@@ -34,27 +35,21 @@ fn main() -> Result<()> {
     });
 
     // for each update
-    let mut valid_updates: Vec<Vec<i32>> = vec![];
+    let mut incorrects: Vec<Vec<i32>> = vec![];
     for update in updates.iter() {
-        let mut valid = true;
-        for i in 0..update.len() {
-            let current = update[i];
-            if let Some(forbidden_befores) = rule_lookup_table.get(&current) {
-                let before = update.iter().take(i).collect::<Vec<&i32>>();
-                // this runtime is going to be really terrible.
-                if forbidden_befores.iter().any(|x| before.contains(&x)) {
-                    valid = false;
-                    break;
-                }
-            }
-        }
-        if valid {
-            valid_updates.push(update.clone());
+        if !is_correct(update, &rule_lookup_table).0 {
+            incorrects.push(update.clone());
         }
     }
+    let mut corrected_updates = Vec::new();
+
+    for incorrect in incorrects {
+        corrected_updates.push(corrected(incorrect, &rule_lookup_table)); 
+    }
+
 
     let mut middles = Vec::new();
-    for update in valid_updates.iter() {
+    for update in corrected_updates.iter() {
         // get the middle value of the list. hope they're all odd
         if update.len() % 2 == 0 {
             panic!("update list is not odd");
@@ -65,4 +60,46 @@ fn main() -> Result<()> {
     println!("{}", middles.iter().sum::<i32>());
     println!("Time: {}ms", now.elapsed().as_millis());
     Ok(())
-}    
+}   
+
+fn is_correct(update: &Vec<i32>, rule_lookup_table: &HashMap<i32,Vec<i32>>) -> (bool, usize) {
+    for i in 0..update.len() {
+        let current = update[i];
+        if let Some(forbidden_befores) = rule_lookup_table.get(&current) {
+            let before = update.iter().take(i).collect::<Vec<&i32>>();
+            // this runtime is going to be really terrible.
+            if forbidden_befores.iter().any(|x| before.contains(&x)) {
+                return (false, i);
+            }
+        }
+    }
+    return (true, usize::MIN);
+}
+    
+
+fn corrected(incorrect: Vec<i32>, rule_lookup_table: &HashMap<i32,Vec<i32>>) -> Vec<i32>{
+    let mut corrected = incorrect.clone();
+    let mut i = 0;
+    loop {
+        let (correct, incorrect_pos) = is_correct(&corrected, &rule_lookup_table); 
+        if correct {
+            return corrected;
+        }
+        // find the rule we're breaking
+        let before = corrected.clone().into_iter().take(incorrect_pos).collect::<Vec<i32>>();
+        let to_correct = corrected.remove(incorrect_pos);
+        let rules = rule_lookup_table.get(&to_correct).unwrap();
+        for rule in rules {
+            if !before.contains(&rule) {
+                corrected.insert(incorrect_pos, *rule);
+                break;
+            }
+        }
+        
+        i += 1;
+        println!("===============================");
+        if i > 1000 {
+            panic!("infinite loop");
+        }
+    }
+}
