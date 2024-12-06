@@ -11,9 +11,7 @@ fn main() -> Result<()> {
     use std::time::Instant;
     let now = Instant::now();
     let path = "./input.txt";
-    let mut file = File::open(path)?;
-    let mut contents = String::new();
-    file.read_to_string(&mut contents)?;
+    let contents = helpers::get_input(path).unwrap();
     let (rules_raw, updates_raw) = contents.split_once("\n\n").unwrap();
     let rules_vec = rules_raw.lines().collect::<Vec<&str>>();
     let updates_vec = updates_raw.lines().collect::<Vec<&str>>();
