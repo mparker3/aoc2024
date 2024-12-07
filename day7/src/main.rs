@@ -11,18 +11,22 @@ impl Equation {
         let [car, cdr @ ..] = self.inputs.as_slice()
         else { panic!("empty input") };
 
-        return can_hit_target(self.output, *car, cdr.to_vec())
+        return can_hit_target(self.output, *car, cdr)
     }
 }
 
-fn can_hit_target(target: u64, current: u64, remaining: Vec<u64>) -> bool {
-    if let [car, cdr @ ..] = remaining.as_slice() {
-        return can_hit_target(target, current + car, cdr.to_vec()) 
-        || can_hit_target(target, current * car, cdr.to_vec())
-        || can_hit_target(target, concat(current, *car), cdr.to_vec())
+fn can_hit_target(target: u64, current: u64, remaining: &[u64]) -> bool {
+    match remaining {
+        [car, cdr @ ..] => {
+            if current > target {
+                return false
+            }
+            can_hit_target(target, current + car, cdr) 
+            || can_hit_target(target, current * car, cdr)
+            || can_hit_target(target, concat(current, *car), cdr)
+        }
+        [] => current == target
     }
-
-    return current == target;
 }
 
 fn concat(head: u64, tail: u64) -> u64 {
