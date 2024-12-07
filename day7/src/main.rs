@@ -15,7 +15,7 @@ impl Equation {
     }
 }
 
-fn can_hit_target(target: u64, current: u64, mut remaining: Vec<u64>) -> bool {
+fn can_hit_target(target: u64, current: u64, remaining: Vec<u64>) -> bool {
     if let [car, cdr @ ..] = remaining.as_slice() {
         return can_hit_target(target, current + car, cdr.to_vec()) 
         || can_hit_target(target, current * car, cdr.to_vec())
@@ -26,8 +26,16 @@ fn can_hit_target(target: u64, current: u64, mut remaining: Vec<u64>) -> bool {
 }
 
 fn concat(head: u64, tail: u64) -> u64 {
-    // surely this will never overflow
-    format!("{}{}", head, tail).parse::<u64>().unwrap()
+    // get tail down to the nearest power of 10
+    let mut power: u64 = 1;
+    let mut closest = tail;
+    while closest >= 10 {
+        power *= 10;
+        closest /= 10;
+    }
+    // take to the next place
+    power *= 10;
+    (head * power) + tail
 }
 
 
@@ -46,7 +54,6 @@ fn main() {
         }
     });
 
-    // TODO(mparker): multithread this if makes sense in part 2. should be fairly straightforward
     let mut result = 0;
     for eqn in eqns {
         if eqn.is_solvable() {
