@@ -16,11 +16,18 @@ impl Equation {
 }
 
 fn can_hit_target(target: u64, current: u64, mut remaining: Vec<u64>) -> bool {
-    
     if let [car, cdr @ ..] = remaining.as_slice() {
-        return can_hit_target(target, current + car, cdr.to_vec()) || can_hit_target(target, current * car, cdr.to_vec()) // TODO(mparker): are these conversions going to kill me?
+        return can_hit_target(target, current + car, cdr.to_vec()) 
+        || can_hit_target(target, current * car, cdr.to_vec())
+        || can_hit_target(target, concat(current, *car), cdr.to_vec())
     }
+
     return current == target;
+}
+
+fn concat(head: u64, tail: u64) -> u64 {
+    // surely this will never overflow
+    format!("{}{}", head, tail).parse::<u64>().unwrap()
 }
 
 
