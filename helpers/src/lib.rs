@@ -7,6 +7,7 @@ pub fn get_input(path: &str) -> String {
     contents
 }
 
+// TODO(mparker): offering an iterator could be useful 
 pub fn into_grid(grid_str: &str) -> Vec<Vec<char>> {
     grid_str.split("\n").map(|x| x.chars().collect::<Vec<char>>()).collect()
 }
