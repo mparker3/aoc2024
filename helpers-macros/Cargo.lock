@@ -3,18 +3,6 @@
 version = 4
 
 [[package]]
-name = "day10"
-version = "0.1.0"
-dependencies = [
- "helpers",
- "helpers-macros",
-]
-
-[[package]]
-name = "helpers"
-version = "0.1.0"
-
-[[package]]
 name = "helpers-macros"
 version = "0.1.0"
 dependencies = [

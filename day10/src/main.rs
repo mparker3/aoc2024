@@ -1,6 +1,7 @@
 use std::collections::{HashSet, VecDeque};
-
 use helpers::*;
+#[macro_use]
+extern crate helpers_macros;
 
 #[derive(Debug, Clone)]
 pub struct Grid<T> {
@@ -60,6 +61,7 @@ impl Grid<u8> {
     }
 }
 
+// #[helpers_macros::timeit]
 fn main() {
     let input = get_input("input.txt");
     let rows = input.split("\n").collect::<Vec<&str>>();
