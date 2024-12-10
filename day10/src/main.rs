@@ -27,13 +27,11 @@ impl<T: Clone + Default + Copy> Grid<T> {
         let mut coords = Vec::new();
         let row = row as i32;
         let col = col as i32;
-        for row_offset in vec![-1, 1] {
-            for col_offset in vec![-1, 1] {
-                let new_row = row + row_offset;
-                let new_col = col + col_offset;
-                if new_row >= 0 && new_col >= 0 && new_row < self.data.len() as i32 && new_col < self.data[0].len() as i32 {
-                    coords.push((new_row as usize, new_col as usize));
-                }
+        for (row_offset, col_offset) in vec![(0, 1), (1, 0), (0, -1), (-1, 0)] {
+            let new_row = row + row_offset;
+            let new_col = col + col_offset;
+            if new_row >= 0 && new_col >= 0 && new_row < self.data.len() as i32 && new_col < self.data[0].len() as i32 {
+                coords.push((new_row as usize, new_col as usize));
             }
         }
         coords
@@ -70,7 +68,7 @@ impl Grid<u8> {
 }
 
 fn main() {
-    let input = get_input("sample.txt");
+    let input = get_input("input.txt");
     let rows = input.split("\n").collect::<Vec<&str>>();
     let mut grid = Grid::new(rows.len(), rows[0].len());
     let mut starting_points = vec![];
@@ -83,6 +81,7 @@ fn main() {
             }
         }
     }
+    println!("{:?}", starting_points);
 
     let score = starting_points.iter().map(|(row, col)| grid.get_score(*row, *col)).sum::<u32>();
 
