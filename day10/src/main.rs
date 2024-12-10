@@ -41,25 +41,18 @@ impl<T: Clone + Default + Copy> Grid<T> {
 impl Grid<u8> {
     pub fn get_score(&self, row: usize, col: usize) -> u32 {
         let mut score = 0;
-        let mut visited = HashSet::new();
+        // let mut visited = HashSet::new();
         let mut queue = VecDeque::new();
-        queue.push_back((row, col, 0));
+        queue.push_front((row, col, 0));
         while !queue.is_empty() {
             let (row, col, height) = queue.pop_front().unwrap();
-            if visited.contains(&(row, col)) {
-                continue;
-            }
-            visited.insert((row, col));
             let val = self.get(row, col);
             if val == 9 {
                 score += 1;
             }
             for (new_row, new_col) in self.get_neighboring_coords(row, col) {
-                if visited.contains(&(new_row, new_col)) {
-                    continue;
-                }
                 if self.get(new_row, new_col) == height + 1 {
-                    queue.push_back((new_row, new_col, height + 1));
+                    queue.push_front((new_row, new_col, height + 1));
                 }
             }
         }
