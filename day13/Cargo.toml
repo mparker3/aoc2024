@@ -1,0 +1,9 @@
+[package]
+name = "day13"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+helpers = { path = "../helpers"}
+helpers-macros = { path = "../helpers-macros"}
+regex = "1.11.1"
