@@ -7,3 +7,4 @@ edition = "2021"
 helpers = { path = "../helpers"}
 helpers-macros = { path = "../helpers-macros"}
 regex = "1.11.1"
+nalgebra = "0.33.2"
