@@ -1,4 +1,5 @@
-use std::collections::HashMap;
+use core::f64;
+use std::{collections::HashMap, thread::sleep, time::Duration};
 
 use helpers::get_input;
 use helpers_macros::timeit;
@@ -50,41 +51,33 @@ fn main() {
         };
         robots.push(robot);
     }
-    print_grid(&robots, dims);
-    for i in 0..100 {
+    print_grid(&robots, dims, 0);
+    let mut min_centrality: f64 = f64::MAX;
+    for i in 0..10000 {
         for robot in robots.iter_mut() {
             robot.step(dims.0, dims.1);
         }
-        print_grid(&robots, dims);
-    }
-    println!("{}", partition_grid(&robots, dims).into_iter().map(|x| x.len()).product::<usize>());
-}
-
-fn partition_grid(robots: &Vec<Robot>, dims: (isize, isize)) -> Vec<Vec<Robot>> {
-    let x_div = dims.0 / 2;
-    let y_div = dims.1 / 2;
-    let mut grid: Vec<Vec<Robot>> = vec![vec![]; 4];
-    for robot in robots {
-        if !(robot.position.x == x_div || robot.position.y == y_div) {
-            if robot.position.x < x_div {
-                if robot.position.y < y_div {
-                    grid[0].push(robot.clone());
-                } else {
-                    grid[1].push(robot.clone());
-                }
-            } else {
-                if robot.position.y < y_div {
-                    grid[2].push(robot.clone());
-                } else {
-                    grid[3].push(robot.clone());
-                }
-            }
+        let centrality = get_total_distance(&robots, dims);
+        if centrality < min_centrality {
+            min_centrality = centrality;
+            println!("{}", i);
+        print_grid(&robots, dims, i);
         }
     }
-    grid
 }
 
-fn print_grid(robots: &Vec<Robot>, dims: (isize, isize)) {
+fn get_total_distance(robots: &Vec<Robot>, dims: (isize, isize)) -> f64 {
+    let x_ctr = dims.0 / 2;
+    let y_ctr = dims.1 / 2;
+    let mut total_dist = 0.0;
+    for robot in robots {
+        total_dist += ((robot.position.x - x_ctr) as f64).powi(2) + ((robot.position.y - y_ctr) as f64).powi(2);
+    }
+    total_dist
+}
+
+fn print_grid(robots: &Vec<Robot>, dims: (isize, isize), itr: usize) {
+    // print!("{}[2J", 27 as char);
     let mut grid: Vec<Vec<char>> = vec![vec!['.'; dims.0 as usize]; dims.1 as usize];
     let mut pos_cts: HashMap<Point, usize> = HashMap::new();
     for robot in robots {
@@ -97,4 +90,5 @@ fn print_grid(robots: &Vec<Robot>, dims: (isize, isize)) {
         println!("{}", row.iter().collect::<String>());
     }
     println!("\n");
+    println!("{}", itr);
 }
