@@ -1,0 +1,9 @@
+[package]
+name = "day15"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+helpers = { path = "../helpers"}
+helpers-macros = { path = "../helpers-macros"}
+lazy_static = "1.4.0"
